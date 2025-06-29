@@ -13,8 +13,8 @@ if not dist.is_initialized():
     fs_init.initialize_model_parallel(1)
     
 def run():
-    ckpt_dir = "/root/tt/new_branch/llama3.1-8B/8B"
-    tokenizer_path = "/root/tt/new_branch/llama3.1-8B/original/tokenizer.model"
+    ckpt_dir = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/8B"
+    tokenizer_path = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/original/tokenizer.model"
     prompt = (
         "Q: A bumper car rink has 12 red cars. They have 2 fewer green cars than they have red cars. "
         "They have 3 times the number of blue cars as they have green cars. The rink also has yellow cars. "
@@ -39,7 +39,7 @@ def run():
     # Generate answer
     results = llama.text_completion(
         prompts=[prompt],
-        temperature=0.8,  # greedy decoding
+        temperature=0.0,  # greedy decoding
         top_p=0.95,
         max_gen_len=max_gen_len,
         echo=False,

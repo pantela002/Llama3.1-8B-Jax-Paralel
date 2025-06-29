@@ -26,8 +26,8 @@ def jax_load(ckpt_dir: str, tokenizer_path: str, max_seq_length: int = 2048) -> 
     return llama
 
 def main(
-    ckpt_dir: str = "/root/tt/new_branch/llama3.1-8B/8B",
-    tokenizer_path: str = "/root/tt/new_branch/llama3.1-8B/original/tokenizer.model",
+    ckpt_dir: str = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/8B",
+    tokenizer_path: str = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/original/tokenizer.model",
     prompt = (
         "Q: A bumper car rink has 12 red cars. They have 2 fewer green cars than they have red cars. "
         "They have 3 times the number of blue cars as they have green cars. The rink also has yellow cars. "
@@ -35,7 +35,7 @@ def main(
         "A:"
     ),
     max_gen_len: int = 256,
-    temperature: float = 0.8,
+    temperature: float = 0.0,
     top_p: float = 0.95
 ):
     
