@@ -10,10 +10,10 @@ This draft PR adds a tensor-parallel JAX implementation of Meta’s LLaMA 3.1–
 ```
 All changes for this draft PR are in the branch:
 
-llama_paralel
+Llama3.1-8B-paralel
 
 Clone the repository and checkout the branch:
-git checkout llama_paralel
+git checkout Llama3.1-8B-paralel
 
 cd Llama3.1-8B-Jax-Paralel
 ```
