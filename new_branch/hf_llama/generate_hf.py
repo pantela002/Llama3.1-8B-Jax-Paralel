@@ -16,15 +16,13 @@ def run():
     ckpt_dir = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/8B"
     tokenizer_path = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/original/tokenizer.model"
     prompt = (
-        "Q: A bumper car rink has 12 red cars. They have 2 fewer green cars than they have red cars. "
-        "They have 3 times the number of blue cars as they have green cars. The rink also has yellow cars. "
-        "If the rink has 75 cars in total how many yellow cars do they have?\n"
-        "A:"
+        "What is the name of the largest planet in our solar system?"
     )
 
-    max_seq_len = 512
+    max_seq_len = 1024
     max_batch_size = 1
-    max_gen_len = 256
+    max_gen_len = 512
+    n_layers = 16
 
     # Initialize Llama model and tokenizer
     llama = Llama.build(
@@ -33,14 +31,15 @@ def run():
         max_seq_len=max_seq_len,
         max_batch_size=max_batch_size,
         model_parallel_size=1,  
-        n_layers=32,  
+        n_layers=n_layers 
     )
+
 
     # Generate answer
     results = llama.text_completion(
         prompts=[prompt],
         temperature=0.0,  # greedy decoding
-        top_p=0.95,
+        top_p=1.0,
         max_gen_len=max_gen_len,
         echo=False,
         logprobs=False,

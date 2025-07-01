@@ -24,7 +24,7 @@ class ModelArgs:
     rope_theta: float = 500000.0
 
     max_batch_size: int = 1
-    max_seq_len: int = 512
+    max_seq_len: int = 1024
 
 def config_from_params(args: ModelArgs) -> LLaMAConfig:
     intermediate_size = int(2 * (args.dim * 4) / 3)
@@ -43,7 +43,7 @@ def config_from_params(args: ModelArgs) -> LLaMAConfig:
         rope_theta=args.rope_theta
     )
 
-def convert_llama_weights(ckpt_dir: str, tokenizer: LLaMA3Tokenizer, max_seq_len: int=2048, verbose: bool=False) -> Tuple[PyTree[np.ndarray], LLaMAConfig]:
+def convert_llama_weights(ckpt_dir: str, tokenizer: LLaMA3Tokenizer, max_seq_len: int=2048, n_layers: int = 32, verbose: bool=False) -> Tuple[PyTree[np.ndarray], LLaMAConfig]:
     ckpt_paths = sorted(Path(ckpt_dir).glob("*.pth"))
     ckpts = {}
     for i, ckpt_path in enumerate(ckpt_paths):
@@ -60,30 +60,30 @@ def convert_llama_weights(ckpt_dir: str, tokenizer: LLaMA3Tokenizer, max_seq_len
 
     jax_weights = {
         'transformer': {
-            'wte': {'embedding': np.concatenate([ckpt['tok_embeddings.weight'].type(torch.float16).numpy() for ckpt in ckpts], axis=1)}, 
-            'ln_f': {'kernel': ckpts[0]['norm.weight'].type(torch.float16).numpy()}, 
+            'wte': {'embedding': np.concatenate([ckpt['tok_embeddings.weight'].type(torch.float32).numpy() for ckpt in ckpts], axis=1)}, 
+            'ln_f': {'kernel': ckpts[0]['norm.weight'].type(torch.float32).numpy()}, 
             'h': {
                 '%d' % (layer): {
                     'attention': {
-                        'wq': {'kernel': np.concatenate([ckpt['layers.%d.attention.wq.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=0).transpose()}, 
-                        'wk': {'kernel': np.concatenate([ckpt['layers.%d.attention.wk.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=0).transpose()}, 
-                        'wv': {'kernel': np.concatenate([ckpt['layers.%d.attention.wv.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=0).transpose()}, 
-                        'wo': {'kernel': np.concatenate([ckpt['layers.%d.attention.wo.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=1).transpose()}, 
+                        'wq': {'kernel': np.concatenate([ckpt['layers.%d.attention.wq.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=0).transpose()}, 
+                        'wk': {'kernel': np.concatenate([ckpt['layers.%d.attention.wk.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=0).transpose()}, 
+                        'wv': {'kernel': np.concatenate([ckpt['layers.%d.attention.wv.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=0).transpose()}, 
+                        'wo': {'kernel': np.concatenate([ckpt['layers.%d.attention.wo.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=1).transpose()}, 
                     }, 
                     'feed_forward': {
-                        'w1': {'kernel': np.concatenate([ckpt['layers.%d.feed_forward.w1.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=0).transpose()}, 
-                        'w2': {'kernel': np.concatenate([ckpt['layers.%d.feed_forward.w2.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=1).transpose()}, 
-                        'w3': {'kernel': np.concatenate([ckpt['layers.%d.feed_forward.w3.weight' % (layer)].type(torch.float16).numpy() for ckpt in ckpts], axis=0).transpose()}, 
+                        'w1': {'kernel': np.concatenate([ckpt['layers.%d.feed_forward.w1.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=0).transpose()}, 
+                        'w2': {'kernel': np.concatenate([ckpt['layers.%d.feed_forward.w2.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=1).transpose()}, 
+                        'w3': {'kernel': np.concatenate([ckpt['layers.%d.feed_forward.w3.weight' % (layer)].type(torch.float32).numpy() for ckpt in ckpts], axis=0).transpose()}, 
                     }, 
-                    'attention_norm': {'kernel': ckpts[0]['layers.%d.attention_norm.weight' % (layer)].type(torch.float16).numpy()}, 
-                    'ffn_norm': {'kernel': ckpts[0]['layers.%d.ffn_norm.weight' % (layer)].type(torch.float16).numpy()}, 
+                    'attention_norm': {'kernel': ckpts[0]['layers.%d.attention_norm.weight' % (layer)].type(torch.float32).numpy()}, 
+                    'ffn_norm': {'kernel': ckpts[0]['layers.%d.ffn_norm.weight' % (layer)].type(torch.float32).numpy()}, 
                 }
-            for layer in range(params['n_layers'])},  # params['n_layers'] is defined in params.json 
+            for layer in range(n_layers)},  # params['n_layers'] is defined in params.json 
         }, 
-        'lm_head': {'kernel': np.concatenate([ckpt['output.weight'].type(torch.float16).numpy() for ckpt in ckpts], axis=0).transpose()}, 
+        'lm_head': {'kernel': np.concatenate([ckpt['output.weight'].type(torch.float32).numpy() for ckpt in ckpts], axis=0).transpose()}, 
     }
     
-    params.update({'vocab_size': len(tokenizer), 'max_seq_len': max_seq_len, 'n_layers': params['n_layers']})
+    params.update({'vocab_size': len(tokenizer), 'max_seq_len': max_seq_len, 'n_layers': n_layers})
     llama_config = config_from_params(ModelArgs(**params))
 
     del ckpts

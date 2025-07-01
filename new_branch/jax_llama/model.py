@@ -54,6 +54,7 @@ def precompute_freqs_cis(dim: int, end: int, theta: float = 500000.0):
     t = jnp.arange(end)
     freqs = jnp.outer(t, freqs)
     freqs_cis = jnp.exp(1j * freqs)
+    
     return freqs_cis
 
 def apply_rotary_emb(
@@ -170,7 +171,7 @@ class FlaxLLaMAAttention(nn.Module):
             config.max_sequence_length * 2, 
             theta=config.rope_theta
         )
-    
+         
     def _split_heads(self, hidden_states, num_heads):
         return hidden_states.reshape(hidden_states.shape[:2] + (num_heads, self.head_dim))
 
@@ -770,4 +771,3 @@ class FlaxLLaMAForCausalLM(FlaxLLaMAPreTrainedModel):
         model_kwargs["past_key_values"] = model_outputs.past_key_values
         model_kwargs["position_ids"] = model_kwargs["position_ids"][:, -1:] + 1
         return model_kwargs
-

@@ -14,22 +14,21 @@ from fairscale.nn.model_parallel.layers import (
     VocabParallelEmbedding,
 )
 from torch import nn
-
-
+import numpy as np
 @dataclass
 class ModelArgs:
     dim: int = 4096
     n_layers: int = 32
     n_heads: int = 32
-    n_kv_heads: Optional[int] = None
+    n_kv_heads: Optional[int] = 8
     vocab_size: int = -1
     multiple_of: int = 256  # make SwiGLU hidden layer size multiple of large power of 2
-    ffn_dim_multiplier: Optional[float] = None
+    ffn_dim_multiplier: Optional[float] = 1.3
     norm_eps: float = 1e-5
-    rope_theta: float = 500000
-
+    rope_theta: float = 500000.0
+    intermediate_size: int = 14336
     max_batch_size: int = 32
-    max_seq_len: int = 2048
+    max_seq_len: int = 1024
 
 
 class RMSNorm(torch.nn.Module):
@@ -46,11 +45,14 @@ class RMSNorm(torch.nn.Module):
         return output * self.weight
 
 
-def precompute_freqs_cis(dim: int, end: int, theta: float = 10000.0):
+def precompute_freqs_cis(dim: int, end: int, theta: float = 500000.0):
     freqs = 1.0 / (theta ** (torch.arange(0, dim, 2)[: (dim // 2)].float() / dim))
     t = torch.arange(end, device=freqs.device, dtype=torch.float32)
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)  # complex64
+    real = np.real(np.asarray(freqs_cis))
+    imag = np.imag(np.asarray(freqs_cis))
+    np.savetxt("freqs_cis_hf.txt", np.stack((real, imag), axis=-1).reshape(-1, dim), fmt='%.6f')
     return freqs_cis
 
 
@@ -278,6 +280,8 @@ class Transformer(nn.Module):
     def forward(self, tokens: torch.Tensor, start_pos: int):
         _bsz, seqlen = tokens.shape
         h = self.tok_embeddings(tokens)
+        h = h.float()  # ensure float32 for numerical stability
+        print("type h ", h.dtype)
         self.freqs_cis = self.freqs_cis.to(h.device)
         freqs_cis = self.freqs_cis[start_pos : start_pos + seqlen]
 
