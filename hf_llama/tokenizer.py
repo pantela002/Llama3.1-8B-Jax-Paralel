@@ -54,7 +54,7 @@ class Tokenizer:
             model_path (str): The path to the Tiktoken model file.
         """
         assert os.path.isfile(model_path), model_path
-
+        print(model_path)
         mergeable_ranks = load_tiktoken_bpe(model_path)
         num_base_tokens = len(mergeable_ranks)
         special_tokens = [

@@ -14,7 +14,7 @@ from fairscale.nn.model_parallel.layers import (
     VocabParallelEmbedding,
 )
 from torch import nn
-import numpy as np
+
 @dataclass
 class ModelArgs:
     dim: int = 4096
@@ -50,9 +50,6 @@ def precompute_freqs_cis(dim: int, end: int, theta: float = 500000.0):
     t = torch.arange(end, device=freqs.device, dtype=torch.float32)
     freqs = torch.outer(t, freqs)
     freqs_cis = torch.polar(torch.ones_like(freqs), freqs)  # complex64
-    real = np.real(np.asarray(freqs_cis))
-    imag = np.imag(np.asarray(freqs_cis))
-    np.savetxt("freqs_cis_hf.txt", np.stack((real, imag), axis=-1).reshape(-1, dim), fmt='%.6f')
     return freqs_cis
 
 

@@ -1,7 +1,12 @@
-from generation import Llama
 import os
 import fairscale.nn.model_parallel.initialize as fs_init
-import torch.distributed as dist  # type: ignore
+import torch.distributed as dist  
+from generation import Llama
+
+from pathlib import Path
+ROOT = Path(__file__).parent.parent  # This gives you the path to "project/"
+
+
 # Only initialize once
 if not dist.is_initialized():
     os.environ.setdefault("RANK", "0")
@@ -13,12 +18,12 @@ if not dist.is_initialized():
     fs_init.initialize_model_parallel(1)
     
 def run():
-    ckpt_dir = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/8B"
-    tokenizer_path = "/root/tt/Llama3.1-8B-Jax-Paralel/new_branch/llama3.1-8B/original/tokenizer.model"
+    ckpt_dir = str(ROOT / "llama3.1-8B/8B")
+    tokenizer_path =  str(ROOT / "llama3.1-8B/original/tokenizer.model")
     prompt = (
         "What is the name of the largest planet in our solar system?"
     )
-
+    print(ckpt_dir, tokenizer_path, prompt)
     max_seq_len = 1024
     max_batch_size = 1
     max_gen_len = 512

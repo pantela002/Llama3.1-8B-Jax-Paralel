@@ -224,7 +224,7 @@ class Llama:
             out_tokens.append(toks)
             out_logprobs.append(probs)
 
-        with open("merged_tokens_hf.txt", "w") as f:
+        with open("hf_output.txt", "w") as f:
             for inp, out in zip(prompt_tokens, out_tokens):
                 if echo:
                     merged = out
