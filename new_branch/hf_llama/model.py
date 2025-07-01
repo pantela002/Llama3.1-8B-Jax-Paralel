@@ -281,7 +281,6 @@ class Transformer(nn.Module):
         _bsz, seqlen = tokens.shape
         h = self.tok_embeddings(tokens)
         h = h.float()  # ensure float32 for numerical stability
-        print("type h ", h.dtype)
         self.freqs_cis = self.freqs_cis.to(h.device)
         freqs_cis = self.freqs_cis[start_pos : start_pos + seqlen]
 

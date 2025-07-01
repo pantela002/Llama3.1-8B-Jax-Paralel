@@ -15,10 +15,10 @@ class LLaMAConfig(PretrainedConfig):
     vocab_size=128256,
     hidden_size=4096,
     intermediate_size=14336,
-    num_hidden_layers=32, #32
+    num_hidden_layers=32,
     num_attention_heads=32,
     num_key_value_heads=8,
-    max_sequence_length=2048, #131072,
+    max_sequence_length=2048,
     rms_norm_eps=1e-5,
     initializer_range=0.02,
     use_cache=True,

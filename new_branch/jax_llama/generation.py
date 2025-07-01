@@ -1,5 +1,3 @@
-import jax
-import numpy as np
 import jax.numpy as jnp
 from model import FlaxLLaMAForCausalLM
 from llama3_tokenizer import Tokenizer as LLaMA3Tokenizer
@@ -8,9 +6,8 @@ from jax.sharding import Mesh
 from jax.sharding import PartitionSpec as P
 from jaxtyping import PyTree
 from flax import struct
-from functools import partial
-from typing import List, Optional, Union
-import gc
+from typing import List, Optional
+
 
 class LLaMA(struct.PyTreeNode):
     params: PyTree
@@ -18,7 +15,7 @@ class LLaMA(struct.PyTreeNode):
     tokenizer: LLaMA3Tokenizer = struct.field(pytree_node=False)
     mesh: Optional[Mesh] = struct.field(pytree_node=False, default=None)
 
-    def generate(self, tokens: jnp.ndarray, attention_mask: jnp.ndarray, max_gen_len: int, temperature: float = 0.8, top_p: float = 0.95, do_sample: bool = False) -> jnp.ndarray:
+    def generate(self, tokens: jnp.ndarray, attention_mask: jnp.ndarray, max_gen_len: int, temperature: float = 0.0, top_p: float = 1, do_sample: bool = False) -> jnp.ndarray:
         generations = self.model.generate(
             input_ids=tokens, 
             attention_mask=attention_mask, 
@@ -33,11 +30,9 @@ class LLaMA(struct.PyTreeNode):
                 top_p=top_p,
             )
         )
-        out_tokens = generations.sequences
-        
-        return out_tokens
+        return generations.sequences
     
-    def generate_from_str(self, prompts: List[str], max_gen_len: int, temperature: float = 0.1, top_p: float = 0.99, do_sample: bool = False) -> jnp.ndarray:
+    def generate_from_str(self, prompts: List[str], max_gen_len: int, temperature: float = 0.0, top_p: float = 1, do_sample: bool = False) -> jnp.ndarray:
         prompt_tokens = [self.tokenizer.encode(x, bos=True, eos=False,  allowed_special="all", disallowed_special=()) for x in prompts]
 
 

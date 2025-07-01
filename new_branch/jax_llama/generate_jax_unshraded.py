@@ -37,17 +37,6 @@ def main(
     n_layers: int = 16,
     max_seq_length: int = 1024
 ):
-    
-    #example prompts
-    #In a dance class of 20 students, 20% enrolled in contemporary dance, 25% of the remaining enrolled in jazz dance, and the rest enrolled in hip-hop dance. What percentage of the entire students enrolled in hip-hop dance?
-    #A robe takes 2 bolts of blue fiber and half that much white fiber. How many bolts in total does it take?
-    #A bumper car rink has 12 red cars. They have 2 fewer green cars than they have red cars. They have 3 times the number of blue cars as they have green cars. The rink also has yellow cars.  If the rink has 75 cars in total how many yellow cars do they have?
-    
-    #answers
-    # 60
-    # 3
-    # 23
-
     print("🚀 Loading LLaMA...")
     llama = jax_load(ckpt_dir, tokenizer_path, max_seq_length=max_seq_length, n_layers=n_layers)
 

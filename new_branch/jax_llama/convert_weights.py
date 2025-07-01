@@ -1,4 +1,3 @@
-from typing import Union
 from pathlib import Path
 import torch
 import json
@@ -8,8 +7,7 @@ from config import LLaMAConfig
 from llama3_tokenizer import Tokenizer as LLaMA3Tokenizer
 from typing import Tuple, Optional
 from dataclasses import dataclass
-import os
-import psutil
+
 
 @dataclass
 class ModelArgs:

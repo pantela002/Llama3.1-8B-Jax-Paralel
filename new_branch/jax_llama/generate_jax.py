@@ -8,7 +8,7 @@ from flax.core.frozen_dict import freeze
 from model import FlaxLLaMAForCausalLM
 from convert_weights import convert_llama_weights
 from llama3_tokenizer import Tokenizer as LLaMA3Tokenizer
-from generation import LLaMA  # your class is here
+from generation import LLaMA
 from jax.sharding import Mesh
 import gc
 
@@ -39,11 +39,11 @@ def main(
     prompt = (
         "What is the name of the largest planet in our solar system?"
     ),
-    max_gen_len: int = 512,
+    max_gen_len: int = 64,
     temperature: float = 0.0,
     top_p: float = 1.0,
-    n_layers: int = 16,
-    max_seq_length: int = 1024
+    n_layers: int = 24,
+    max_seq_length: int = 256
 ):
     # Define mesh
     devices = jax.devices()
@@ -66,9 +66,5 @@ def main(
     gc.collect()
     print("✅ Generation complete.")
     np.savetxt("output_jax.txt", results, fmt="%d")
-    #for i, r in enumerate(results):
-    #    print(f"\n🧾 Prompt {i + 1}: {prompt}")
-    #    print("🧠 Output:", r)
-
 if __name__ == "__main__":
     fire.Fire(main)
