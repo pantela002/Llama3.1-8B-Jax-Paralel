@@ -6,15 +6,27 @@ This draft PR adds a tensor-parallel JAX implementation of Meta’s LLaMA 3.1–
 
 ## ✅ Setup Instructions
 
-### 1. Install Python and Create Virtual Environment
+### 🌿 Branch for This Implementation
+```
+All changes for this draft PR are in the branch:
+
+llama_paralel
+
+Clone the repository and checkout the branch:
+git checkout llama_paralel
+
+cd Llama3.1-8B-Jax-Paralel
 ```
 
-mkdir tt
-cd tt
-python3.12 -m venv llama
-source llama/bin/activate
+### 📦 Install Python Dependencies
 ```
-### 2. Hugging Face Login
+Make sure you're using Python ≥3.10 (tested on 3.12):
+
+pip install -r requirements.txt
+```
+
+
+### 🌿 Hugging Face Login
 ```
 You must log into Hugging Face to download the LLaMA 3.1 weights.
 
@@ -23,19 +35,8 @@ huggingface-cli login
 
     Make sure you've requested access to the Meta LLaMA 3 model: https://huggingface.co/meta-llama
 ```
-### 🌿 Branch for This Implementation
-```
-All changes for this draft PR are in the branch:
 
-llama-3.1.8b-tensor-parallel-draft
-
-Clone the repository and checkout the branch:
-git checkout llama-3.1.8b-tensor-parallel-draft
-
-cd Llama3.1-8B-Jax-Paralel
-```
-
-### 📁 Download and Structure Model Files
+### 🌿 Download and Structure Model Files
 ```
 
 huggingface-cli download meta-llama/Llama-3.1-8B original/tokenizer.model --local-dir sw/llama3.1-8B/original
@@ -55,12 +56,6 @@ llama3.1-8B/
     └── tokenizer.model
 ```
 
-### 📦 Install Python Dependencies
-```
-Make sure you're using Python ≥3.10 (tested on 3.12):
-
-pip install -r requirements.txt
-```
 
 ### ▶️ Running the Scripts
 ```
